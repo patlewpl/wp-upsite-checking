@@ -17,7 +17,7 @@
  * Plugin URI:        https://github.com/patlewpl/wp-upsite-checking
  * Update URI:        https://github.com/patlewpl/wp-upsite-checking
  * Description:       Watches your clients' sites on a schedule and sends an e-mail notification when one goes down. Each client has its own address, recipients and interval.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Requires at least: 5.1
  * Requires PHP:      7.0
  * Author:            Patryk Lewandowski
