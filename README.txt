@@ -85,6 +85,15 @@ target for such rules. The fix belongs on that firewall: add a rule that lets yo
 monitoring through, keyed either on your server's IP address or on a header only
 you send, and put that header in the client's *Extra request headers* field.
 
+== Updates ==
+
+The plugin is not hosted on wordpress.org; it updates from its GitHub repository,
+tracking the `main` branch. New versions appear under Dashboard > Updates and
+install with the normal update button.
+
+An update is offered only when the `Version:` header on `main` is higher than the
+installed one, so raising that header is what releases a version.
+
 == Changelog ==
 
 = 1.0.0 =

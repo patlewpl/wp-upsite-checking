@@ -22,6 +22,7 @@ Hooks are collected by a loader rather than registered inline:
 - `includes/class-wp-upsite-checking-clients.php` — the client records (CRUD, validation, per-client state). One client = one monitored site.
 - `includes/class-wp-upsite-checking-settings.php` — plugin-wide settings only: the addresses notified about *every* client, and the defaults new clients start with.
 - `includes/class-wp-upsite-checking-monitor.php` — owns the WP-Cron events, performs the HTTP check, sends the mail.
+- `includes/class-wp-upsite-checking-updater.php` — offers updates from the GitHub repo, since the plugin is not on wordpress.org.
 - `admin/` — the menu, the client list, the add/edit form and the settings screen; markup lives in `admin/partials/`.
 - `public/` — boilerplate leftovers, **no longer loaded**. The plugin has no front-end behaviour, so the class is not required and its empty CSS/JS are not enqueued. The files are still on disk only because this project is not under version control; they can be deleted. `admin/js/` is dead for the same reason.
 
@@ -54,6 +55,17 @@ Deliverability is explicitly out of scope: the plugin calls plain `wp_mail()`, s
 A top-level `wp-upsite-checking` menu. The client list and the add/edit form are the same page, switched by `?action=new|edit`. Form submissions go through `admin-post.php` handlers (`handle_save_client`, `handle_delete_client`, `handle_check_now`, `handle_check_all`), each guarded by `verify_request()` (capability + nonce) and ending in a redirect. A rejected submission is stashed in a per-user transient so the form can be redisplayed as it was typed.
 
 Partials are `require`d from inside the admin class's methods, so `$this` is in scope — the views use `$this->page_url()` and `$this->plugin_name` directly.
+
+## Updates
+
+The plugin updates itself from `patlewpl/wp-upsite-checking`, branch `main`. `Updater::check_for_update()` reads the `Version:` header out of the raw plugin file on that branch, compares it with `WP_UPSITE_CHECKING_VERSION`, and injects an entry into the `site_transient_update_plugins` transient pointing at the branch zip.
+
+**Releasing is therefore a version bump.** Merging to `main` without raising the `Version:` header ships nothing — no site will see an update. Bump the header and the constant together, as they already have to be.
+
+Two things here are load-bearing and easy to break:
+
+- `fix_source_dir()` on `upgrader_source_selection` renames the unpacked `wp-upsite-checking-main/` back to `wp-upsite-checking/`. Without it an update installs the plugin at a new path, deactivating it and leaving the old copy behind.
+- The lookup is cached in a transient for 6 hours (1 hour after a failure) and skipped when `force-check` is set, so "Check again" is immediate. `flush_cache()` clears it after any plugin update, or the installed version would keep being offered.
 
 ## Conventions
 

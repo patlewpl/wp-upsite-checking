@@ -77,6 +77,7 @@ class Wp_Upsite_Checking {
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_monitor_hooks();
+		$this->define_updater_hooks();
 		$this->define_admin_hooks();
 
 	}
@@ -91,6 +92,7 @@ class Wp_Upsite_Checking {
 	 * - Wp_Upsite_Checking_Settings. Stores the plugin-wide settings.
 	 * - Wp_Upsite_Checking_Clients. Stores the monitored clients.
 	 * - Wp_Upsite_Checking_Monitor. Runs the checks and sends the notifications.
+	 * - Wp_Upsite_Checking_Updater. Offers updates from the GitHub repository.
 	 * - Wp_Upsite_Checking_Admin. Defines all hooks for the admin area.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
@@ -127,6 +129,11 @@ class Wp_Upsite_Checking {
 		 * The class responsible for checking the clients and sending notifications.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp-upsite-checking-monitor.php';
+
+		/**
+		 * The class responsible for offering updates from the GitHub repository.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp-upsite-checking-updater.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
@@ -172,6 +179,25 @@ class Wp_Upsite_Checking {
 		// The event carries the ID of the client to check, so the callback has to
 		// be given that argument.
 		$this->loader->add_action( Wp_Upsite_Checking_Monitor::EVENT, $monitor, 'run_check', 10, 1 );
+
+	}
+
+	/**
+	 * Register the hooks that offer updates from the repository.
+	 *
+	 * Registered outside the admin hooks because WP-Cron refreshes the update
+	 * transient on its own, with no admin screen loaded.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 */
+	private function define_updater_hooks() {
+
+		$updater = new Wp_Upsite_Checking_Updater();
+
+		$this->loader->add_filter( 'site_transient_update_plugins', $updater, 'check_for_update' );
+		$this->loader->add_filter( 'upgrader_source_selection', $updater, 'fix_source_dir', 10, 4 );
+		$this->loader->add_action( 'upgrader_process_complete', $updater, 'flush_cache', 10, 2 );
 
 	}
 
