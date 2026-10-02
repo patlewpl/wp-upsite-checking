@@ -1,0 +1,48 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+
+.wp-upsite-checking-badge {
+	display: inline-block;
+	padding: 0.15em 0.7em;
+	border-radius: 1em;
+	font-weight: 600;
+	line-height: 1.6;
+	background: #f0f0f1;
+	color: #50575e;
+}
+
+.wp-upsite-checking-badge.is-up {
+	background: #edfaef;
+	color: #00701e;
+}
+
+.wp-upsite-checking-badge.is-down {
+	background: #fcf0f1;
+	color: #8a2424;
+}
+
+.wp-upsite-checking-badge.is-off {
+	background: #fcf9e8;
+	color: #8a6116;
+}
+
+.wp-upsite-checking-check-all {
+	display: inline-block;
+	margin-left: 0.5em;
+}
+
+.wp-upsite-checking .wp-upsite-checking-recipients {
+	word-break: break-word;
+}
+
+.wp-upsite-checking .column-primary .row-actions {
+	left: auto;
+	position: static;
+}
+
+.wp-upsite-checking-cron-note {
+	margin-top: 1.5em;
+	max-width: 55em;
+}
